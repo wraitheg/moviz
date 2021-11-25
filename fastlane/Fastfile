@@ -1,0 +1,66 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Upload Snapshot Reference"
+  lane :upload_snapshot do
+    uploadSnapshot()
+  end
+
+  lane :download_snapshot do
+    downloadSnapshot()
+  end
+
+  def uploadSnapshot
+    # zip snapshots
+    zip(
+      path: "./MovizTests/__Snapshots__",
+      output_path: "__Snapshots__.zip"
+    )
+
+    checkAWSCredentials()
+
+    sh("aws", "s3", "cp", "../__Snapshots__.zip", "s3://moviz-bitrise")
+  end
+
+  def downloadSnapshot
+    checkAWSCredentials()
+
+    sh("aws", "s3", "cp", "s3://moviz-bitrise/__Snapshots__.zip", "../__Snapshots__.zip")
+
+    # unzip snapshots
+    unzip(file: "./__Snapshots__.zip", destination_path: "./MovizTests/")
+  end
+
+  def checkAWSCredentials
+    # prepare aws credentials
+    if ENV["AWS_ACCESS_KEY_ID"].nil?
+      aws_access_key_id = prompt(text: "S3 Access Key ID: ")
+      ENV["AWS_ACCESS_KEY_ID"] = aws_access_key_id
+    end
+
+    if ENV["AWS_SECRET_ACCESS_KEY"].nil?
+      aws_secret_access_key = prompt(text: "S3 Secret Access Key: ")
+      ENV["AWS_SECRET_ACCESS_KEY"] = aws_secret_access_key
+    end
+
+    if ENV["AWS_DEFAULT_REGION"].nil?
+      aws_region = prompt(text: "S3 Region: ")
+      ENV["AWS_DEFAULT_REGION"] = aws_region
+    end
+  end
+end
