@@ -10,6 +10,7 @@ import XCTest
 
 class MovizTests: XCTestCase {
     // make an arbitrary change to create something to commit
+    // make a second random entry to test push from branch not feature or main
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
