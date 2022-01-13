@@ -1,7 +1,21 @@
----
-format_version: '11'
-default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
+format_version: "11"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: ios
+app:
+  envs:
+  - BITRISE_PROJECT_PATH: Moviz.xcodeproj
+    opts:
+      is_expand: false
+  - BITRISE_SCHEME: Moviz
+    opts:
+      is_expand: false
+  - BITRISE_DISTRIBUTION_METHOD: development
+    opts:
+      is_expand: false
+meta:
+  bitrise.io:
+    machine_type_id: g2.4core
+    stack: osx-xcode-12.4.x
 trigger_map:
 - push_branch: BE-*
   workflow: build_tst
@@ -18,10 +32,11 @@ workflows:
     - git-clone@6: {}
     - cache-pull@2: {}
     - brew-install@0:
+        title: 'Brew install: awscli'
         inputs:
         - packages: awscli
-        title: 'Brew install: awscli'
     - script@1:
+        title: Carthage Bootstrap
         inputs:
         - content: |-
             #!/usr/bin/env bash
@@ -31,7 +46,6 @@ workflows:
             set -x
 
             sh carthage.sh bootstrap
-        title: Carthage Bootstrap
     - xcode-test@4: {}
     - cache-push@2: {}
   build_tst:
@@ -41,8 +55,9 @@ workflows:
     - git-clone@6: {}
     - cache-pull@2: {}
     - script@1:
+        title: Carthage Bootstrap
         inputs:
-        - content: >-
+        - content: |-
             #!/usr/bin/env bash
             # fail if any commands fails
             set -e
@@ -51,9 +66,7 @@ workflows:
 
             #sh carthage.sh bootstrap
             echo 'test build workflow'
-            echo 'wonder what happens if I modify workflow stop from bitrise UI
-            when it's using yaml from source code.'
-        title: Carthage Bootstrap
+            echo 'wonder what happens if I modify workflow stop from bitrise UI when it is using yaml from source code.'
     - cache-push@2: {}
   primary:
     steps:
@@ -83,18 +96,3 @@ workflows:
     - script@1:
         title: Do anything with Script step
     - cache-push@2: {}
-meta:
-  bitrise.io:
-    stack: osx-xcode-12.4.x
-    machine_type_id: g2.4core
-app:
-  envs:
-  - opts:
-      is_expand: false
-    BITRISE_PROJECT_PATH: Moviz.xcodeproj
-  - opts:
-      is_expand: false
-    BITRISE_SCHEME: Moviz
-  - opts:
-      is_expand: false
-    BITRISE_DISTRIBUTION_METHOD: development
