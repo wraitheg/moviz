@@ -1,6 +1,6 @@
 ---
 format_version: '11'
-default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: ios
 trigger_map:
 - push_branch: BE-*
@@ -42,7 +42,7 @@ workflows:
     - cache-pull@2: {}
     - script@1:
         inputs:
-        - content: |-
+        - content: >-
             #!/usr/bin/env bash
             # fail if any commands fails
             set -e
@@ -51,6 +51,8 @@ workflows:
 
             #sh carthage.sh bootstrap
             echo 'test build workflow'
+            echo 'wonder what happens if I modify workflow stop from bitrise UI
+            when it's using yaml from source code.'
         title: Carthage Bootstrap
     - cache-push@2: {}
   primary:
@@ -67,9 +69,9 @@ workflows:
         - carthage_command: bootstrap
     - xcode-archive@4:
         inputs:
-        - project_path: "$BITRISE_PROJECT_PATH"
-        - scheme: "$BITRISE_SCHEME"
-        - distribution_method: "$BITRISE_DISTRIBUTION_METHOD"
+        - project_path: $BITRISE_PROJECT_PATH
+        - scheme: $BITRISE_SCHEME
+        - distribution_method: $BITRISE_DISTRIBUTION_METHOD
     - deploy-to-bitrise-io@2: {}
     - cache-push@2: {}
   primary_tst:
